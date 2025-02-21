@@ -1,0 +1,31 @@
+.accordion {
+  @apply w-full;
+}
+
+.item {
+  @apply mb-2 w-full overflow-hidden border transition-all duration-300;
+}
+
+.itemOpen {
+  @apply w-full shadow-[0_2px_8px_rgba(0,0,0,0.1)];
+}
+
+.header {
+  @apply flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left text-base focus:outline-none;
+}
+
+.icon {
+  @apply flex transition-transform duration-300;
+}
+
+.open {
+  @apply rotate-90;
+}
+
+.content {
+  @apply max-h-0 overflow-hidden transition-[max-height] duration-300 ease-out;
+}
+
+.contentInner {
+  @apply p-4;
+}
