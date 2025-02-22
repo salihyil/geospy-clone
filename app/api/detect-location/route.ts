@@ -67,8 +67,8 @@ export async function POST(request: NextRequest) {
       const extractedData = {
         country: countryMatch ? countryMatch[1] : "Bilinmiyor",
         confidence: confidenceMatch ? parseFloat(confidenceMatch[1]) : 0,
-        latitude: latitudeMatch ? parseFloat(latitudeMatch[1]) : null,
-        longitude: longitudeMatch ? parseFloat(longitudeMatch[1]) : null,
+        latitude: latitudeMatch ? parseFloat(latitudeMatch[1]) : 0,
+        longitude: longitudeMatch ? parseFloat(longitudeMatch[1]) : 0,
         state: stateMatch ? stateMatch[1] : "Bilinmiyor",
         city: cityMatch ? cityMatch[1] : "Bilinmiyor",
       };

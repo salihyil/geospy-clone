@@ -14,8 +14,8 @@ export function LocationDetails({ location }: LocationDetailsProps) {
       <DetailItem label="City" value={location.city} />
       <DetailItem label="State" value={location.state} />
       <DetailItem label="Country" value={location.country} />
-      <DetailItem label="Latitude" value={location.latitude.toFixed(6)} />
-      <DetailItem label="Longitude" value={location.longitude.toFixed(6)} />
+      <DetailItem label="Latitude" value={location.latitude?.toFixed(6)} />
+      <DetailItem label="Longitude" value={location.longitude?.toFixed(6)} />
       <DetailItem label="Confidence" value={`${location.confidence}%`} />
     </div>
   );
