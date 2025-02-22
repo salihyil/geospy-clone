@@ -49,20 +49,40 @@ export async function POST(request: NextRequest) {
 
       // Generate content with Gemini
       const result = await model.generateContent([
-        "Provide the country, confidence(%), latitude, longitude, state, and city information of the uploaded image if available.Let the output be in json format",
+        `You are a location prediction expert like Google's PlaNet model. Analyze this image and:
+1. Identify any visible landmarks, architecture styles, geographical features, or cultural elements
+2. Look for any text, signs, or writing that might indicate location
+3. Consider the vegetation, climate, and environmental characteristics
+4. Note any distinctive urban planning or architectural patterns
+
+Based on these observations, provide:
+{
+  "country": "name of the country",
+  "confidence": percentage (1-100),
+  "latitude": precise latitude if identifiable or 0,
+  "longitude": precise longitude if identifiable or 0,
+  "state": "state/region name",
+  "city": "city name",
+  "landmarks": ["list of identified landmarks"],
+  "reasoning": "brief explanation of how you determined this location"
+}
+
+Return ONLY the JSON object, no additional text.`,
         ...imageParts,
       ]);
       const response = result.response;
       const description = response.text();
       console.log("Description:", description);
 
-      // Assuming 'description' is the JSON string received
+      // Enhanced regex patterns to match the new JSON structure
       const countryMatch = /"country":\s*"([^"]+)"/.exec(description);
       const confidenceMatch = /"confidence":\s*(\d+)/.exec(description);
       const latitudeMatch = /"latitude":\s*([\d.-]+)/.exec(description);
       const longitudeMatch = /"longitude":\s*([\d.-]+)/.exec(description);
       const stateMatch = /"state":\s*"([^"]+)"/.exec(description);
       const cityMatch = /"city":\s*"([^"]+)"/.exec(description);
+      const landmarksMatch = /"landmarks":\s*\[(.*?)\]/.exec(description);
+      const reasoningMatch = /"reasoning":\s*"([^"]+)"/.exec(description);
 
       const extractedData = {
         country: countryMatch ? countryMatch[1] : "Bilinmiyor",
@@ -71,20 +91,19 @@ export async function POST(request: NextRequest) {
         longitude: longitudeMatch ? parseFloat(longitudeMatch[1]) : 0,
         state: stateMatch ? stateMatch[1] : "Bilinmiyor",
         city: cityMatch ? cityMatch[1] : "Bilinmiyor",
+        landmarks: landmarksMatch
+          ? landmarksMatch[1].split(",").map((s) => s.trim().replace(/"/g, ""))
+          : [],
+        reasoning: reasoningMatch ? reasoningMatch[1] : "Analiz yapılamadı",
       };
 
       console.log("Extracted Data:", extractedData);
 
-      // Use extracted data instead of making additional API calls
+      // Return enhanced response
       return NextResponse.json({
-        city: extractedData.city,
-        state: extractedData.state,
-        country: extractedData.country,
-        latitude: extractedData.latitude,
-        longitude: extractedData.longitude,
-        confidence: extractedData.confidence,
+        ...extractedData,
         aiResponse: description,
-        explanation: `AI Analiz Sonucu: ${description}`,
+        explanation: `AI Analiz Sonucu: ${extractedData.reasoning}`,
       });
     } catch (aiError: unknown) {
       console.error("AI/Konum tespiti hatası:", aiError);
